@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Thi Đấu Team Cầu Lông Trường Chính Trị</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .groups-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 3px solid;
+        }
+        
+        .group-a {
+            border-color: #4CAF50;
+        }
+        
+        .group-b {
+            border-color: #2196F3;
+        }
+        
+        .group-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .group-a .group-title {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .group-b .group-title {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .team {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .group-a .team {
+            border-left-color: #4CAF50;
+        }
+        
+        .group-b .team {
+            border-left-color: #2196F3;
+        }
+        
+        .match {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .match-date {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .match-time {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+        }
+        
+        .vs {
+            color: #999;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+        
+        .stage {
+            margin: 40px 0;
+        }
+        
+        .stage-title {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .bracket {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .bracket-match {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            min-width: 250px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .final-match {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: 4px solid #ff6b6b;
+            min-width: 300px;
+        }
+        
+        .final-match .match-date,
+        .final-match .match-time {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .bracket {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Giải Thi Đấu Team Cầu Lông Trường Chính Trị</h1>
+        <p class="subtitle">Lịch thi đấu và sơ đồ giải đấu</p>
+        
+        <div class="groups-container">
+            <div class="group group-a">
+                <div class="group-title">BẢNG A</div>
+                <div id="groupA-teams"></div>
+            </div>
+            
+            <div class="group group-b">
+                <div class="group-title">BẢNG B</div>
+                <div id="groupB-teams"></div>
+            </div>
+        </div>
+        
+        <div class="stage">
+            <div class="stage-title">VÒNG BẢNG</div>
+            <div id="group-stage-matches"></div>
+        </div>
+        
+        <div class="stage">
+            <div class="stage-title">BÁN KẾT </div>
+            <div class="bracket" id="semi-finals"></div>
+        </div>
+        
+        <div class="stage">
+            <div class="stage-title">CHUNG KẾT</div>
+            <div class="bracket" id="final"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Danh sách 16 người
+        const people = [
+            'em Toàn', 'anh Vĩnh', 'anh Đỉnh', 'anh Mạnh', 
+            'em M.Kiên', 'bạn T.Duy', 'anh Phương', 'bạn Phúc',
+            'em Tú', 'em D.Kiên', 'em Nhật Duy', 'em Sơn', 
+            'Quốc', 'anh Hải', 'anh Thường', 'anh Phú'
+        ];
+        
+        // Hàm shuffle mảng
+        function shuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Tạo 8 đội từ 16 người (ghép đôi ngẫu nhiên)
+        function createTeams(people) {
+            const shuffled = shuffle(people);
+            const teams = [];
+            for (let i = 0; i < shuffled.length; i += 2) {
+                teams.push(`${shuffled[i]} & ${shuffled[i + 1]}`);
+            }
+            return teams;
+        }
+        
+        // Chia thành 2 bảng
+        function divideIntoGroups(teams) {
+            const shuffled = shuffle(teams);
+            return {
+                groupA: shuffled.slice(0, 4),
+                groupB: shuffled.slice(4, 8)
+            };
+        }
+        
+        // Tạo lịch thi đấu vòng bảng
+        function createGroupStageSchedule(groupA, groupB) {
+            const matches = [];
+            
+            // Bảng A - 3 ngày
+            const groupAMatches = [
+                { day: 1, time: '08:00', team1: groupA[0], team2: groupA[1] },
+                { day: 1, time: '09:00', team1: groupA[2], team2: groupA[3] },
+                { day: 2, time: '08:00', team1: groupA[0], team2: groupA[2] },
+                { day: 2, time: '09:00', team1: groupA[1], team2: groupA[3] },
+                { day: 3, time: '08:00', team1: groupA[0], team2: groupA[3] },
+                { day: 3, time: '09:00', team1: groupA[1], team2: groupA[2] }
+            ];
+            
+            // Bảng B - 3 ngày
+            const groupBMatches = [
+                { day: 1, time: '10:00', team1: groupB[0], team2: groupB[1] },
+                { day: 1, time: '11:00', team1: groupB[2], team2: groupB[3] },
+                { day: 2, time: '10:00', team1: groupB[0], team2: groupB[2] },
+                { day: 2, time: '11:00', team1: groupB[1], team2: groupB[3] },
+                { day: 3, time: '10:00', team1: groupB[0], team2: groupB[3] },
+                { day: 3, time: '11:00', team1: groupB[1], team2: groupB[2] }
+            ];
+            
+            return { groupA: groupAMatches, groupB: groupBMatches };
+        }
+        
+        // Khởi tạo giải đấu
+        function initializeTournament() {
+            const teams = createTeams(people);
+            const groups = divideIntoGroups(teams);
+            
+            // Hiển thị các đội trong bảng
+            displayTeams('groupA-teams', groups.groupA);
+            displayTeams('groupB-teams', groups.groupB);
+            
+            // Tạo lịch thi đấu
+            const schedule = createGroupStageSchedule(groups.groupA, groups.groupB);
+            displayGroupStage(schedule);
+            
+            // Hiển thị bán kết và chung kết
+            displayKnockoutStage(groups.groupA, groups.groupB);
+        }
+        
+        // Hiển thị danh sách đội
+        function displayTeams(containerId, teams) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = teams.map((team, index) => 
+                `<div class="team">${index + 1}. ${team}</div>`
+            ).join('');
+        }
+        
+        // Hiển thị lịch thi đấu vòng bảng
+        function displayGroupStage(schedule) {
+            const container = document.getElementById('group-stage-matches');
+            let html = '';
+            
+            // Bảng A
+            html += '<div class="group group-a" style="margin-bottom: 20px;"><div class="group-title">BẢNG A</div>';
+            schedule.groupA.forEach(match => {
+                html += `
+                    <div class="match">
+                        <div class="match-date">Ngày ${match.day} - ${getDateString(match.day)}</div>
+                        <div class="match-teams">
+                            <span>${match.team1}</span>
+                            <span class="vs">VS</span>
+                            <span>${match.team2}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            // Bảng B
+            html += '<div class="group group-b"><div class="group-title">BẢNG B</div>';
+            schedule.groupB.forEach(match => {
+                html += `
+                    <div class="match">
+                        <div class="match-date">Ngày ${match.day} - ${getDateString(match.day)}</div>
+                        <div class="match-teams">
+                            <span>${match.team1}</span>
+                            <span class="vs">VS</span>
+                            <span>${match.team2}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        // Hiển thị vòng loại trực tiếp
+        function displayKnockoutStage(groupA, groupB) {
+            // Bán kết
+            const semiContainer = document.getElementById('semi-finals');
+            semiContainer.innerHTML = `
+                <div class="bracket-match">
+                    <div class="match-date">Ngày 4 - ${getDateString(4)}</div>
+                    <div class="match-teams" style="flex-direction: column; gap: 10px;">
+                        <div>Nhất Bảng A</div>
+                        <div class="vs">VS</div>
+                        <div>Nhì Bảng B</div>
+                    </div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="bracket-match">
+                    <div class="match-date">Ngày 4 - ${getDateString(4)}</div>
+                    <div class="match-teams" style="flex-direction: column; gap: 10px;">
+                        <div>Nhất Bảng B</div>
+                        <div class="vs">VS</div>
+                        <div>Nhì Bảng A</div>
+                    </div>
+                </div>
+            `;
+            
+            // Chung kết
+            const finalContainer = document.getElementById('final');
+            finalContainer.innerHTML = `
+                <div class="bracket-match final-match">
+                    <div class="match-date">Ngày 5 - ${getDateString(5)}</div>
+                    <div class="match-teams" style="flex-direction: column; gap: 15px; font-size: 1.2em;">
+                        <div>Đội thắng Bán kết 1</div>
+                        <div class="vs">🏆 VS 🏆</div>
+                        <div>Đội thắng Bán kết 2</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Lấy ngày tháng (giả sử bắt đầu từ hôm nay)
+        function getDateString(dayOffset) {
+            const today = new Date();
+            const matchDate = new Date(today);
+            matchDate.setDate(today.getDate() + dayOffset - 1);
+            
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            const dayName = days[matchDate.getDay()];
+            const date = matchDate.getDate();
+            const month = matchDate.getMonth() + 1;
+            const year = matchDate.getFullYear();
+            
+            return `${dayName}, ${date}/${month}/${year}`;
+        }
+        
+        // Khởi tạo khi trang được tải
+        initializeTournament();
+    </script>
+</body>
+</html>
