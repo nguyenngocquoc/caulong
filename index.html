@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giải Thi Đấu Team Cầu Lông Trường Chính Trị</title>
+    <title>Giải Thi Đấu Team Cầu Lông Sân Bộ Chỉ Huy Quân Sự</title>
     <style>
         * {
             margin: 0;
@@ -38,8 +38,66 @@
         .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 1.1em;
+        }
+        
+        .rules {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .rules-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .rules-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .rule-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .rule-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .rule-item ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .rule-item li {
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .rule-item li:before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .rules-content {
+                grid-template-columns: 1fr;
+            }
         }
         
         .groups-container {
@@ -204,8 +262,29 @@
 </head>
 <body>
     <div class="container">
-        <h1>Giải Thi Đấu Team Cầu Lông Trường Chính Trị</h1>
+        <h1>Giải Thi Đấu Team Cầu Lông Sân Bộ Chỉ Huy Quân Sự</h1>
         <p class="subtitle">Lịch thi đấu và sơ đồ giải đấu</p>
+        
+        <div class="rules">
+            <div class="rules-title">THỂ LỆ THI ĐẤU</div>
+            <div class="rules-content">
+                <div class="rule-item">
+                    <h3>VÒNG LOẠI (Vòng Bảng)</h3>
+                    <ul>
+                        <li>Đánh 2 set</li>
+                        <li>Thắng: 2 điểm</li>
+                        <li>Hòa: 1 điểm</li>
+                        <li>Thua: 0 điểm</li>
+                    </ul>
+                </div>
+                <div class="rule-item">
+                    <h3>BÁN KẾT & CHUNG KẾT</h3>
+                    <ul>
+                        <li>Đánh 3 set</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         
         <div class="groups-container">
             <div class="group group-a">
@@ -236,42 +315,38 @@
     </div>
     
     <script>
-        // Danh sách 16 người
-        const people = [
-            'em Toàn', 'anh Vĩnh', 'anh Đỉnh', 'anh Mạnh', 
-            'em M.Kiên', 'bạn T.Duy', 'anh Phương', 'bạn Phúc',
-            'em Tú', 'em D.Kiên', 'em Nhật Duy', 'em Sơn', 
-            'Quốc', 'anh Hải', 'anh Thường', 'anh Phú'
-        ];
-        
-        // Hàm shuffle mảng
-        function shuffle(array) {
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-        
-        // Tạo 8 đội từ 16 người (ghép đôi ngẫu nhiên)
-        function createTeams(people) {
-            const shuffled = shuffle(people);
-            const teams = [];
-            for (let i = 0; i < shuffled.length; i += 2) {
-                teams.push(`${shuffled[i]} & ${shuffled[i + 1]}`);
-            }
-            return teams;
-        }
-        
-        // Chia thành 2 bảng
-        function divideIntoGroups(teams) {
-            const shuffled = shuffle(teams);
+        // Cố định các đội và bảng theo yêu cầu
+        function getFixedGroups() {
+            // BẢNG A
+            const groupA = [
+                'bạn Phúc & Quốc',
+                'anh Phương & anh Hải',
+                'em M.Kiên & anh Mạnh',
+                'anh Vĩnh & em Toàn'
+            ];
+            
+            // BẢNG B
+            const groupB = [
+                'em Sơn & em Tú',
+                'bạn T.Duy & em D.Kiên',
+                'anh Thường & em Nhật Duy',
+                'anh Phú & anh Đỉnh'
+            ];
+            
             return {
-                groupA: shuffled.slice(0, 4),
-                groupB: shuffled.slice(4, 8)
+                groupA: groupA,
+                groupB: groupB
             };
         }
+        
+        // Lịch thi đấu cố định
+        const FIXED_SCHEDULE = {
+            day1: 'Thứ Hai, 01/01/2024',
+            day2: 'Thứ Ba, 02/01/2024',
+            day3: 'Thứ Tư, 03/01/2024',
+            day4: 'Thứ Năm, 04/01/2024',  // Bán kết
+            day5: 'Thứ Sáu, 05/01/2024'    // Chung kết
+        };
         
         // Tạo lịch thi đấu vòng bảng
         function createGroupStageSchedule(groupA, groupB) {
@@ -279,22 +354,22 @@
             
             // Bảng A - 3 ngày
             const groupAMatches = [
-                { day: 1, time: '08:00', team1: groupA[0], team2: groupA[1] },
-                { day: 1, time: '09:00', team1: groupA[2], team2: groupA[3] },
-                { day: 2, time: '08:00', team1: groupA[0], team2: groupA[2] },
-                { day: 2, time: '09:00', team1: groupA[1], team2: groupA[3] },
-                { day: 3, time: '08:00', team1: groupA[0], team2: groupA[3] },
-                { day: 3, time: '09:00', team1: groupA[1], team2: groupA[2] }
+                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupA[0], team2: groupA[1] },
+                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupA[2], team2: groupA[3] },
+                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupA[0], team2: groupA[2] },
+                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupA[1], team2: groupA[3] },
+                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupA[0], team2: groupA[3] },
+                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupA[1], team2: groupA[2] }
             ];
             
             // Bảng B - 3 ngày
             const groupBMatches = [
-                { day: 1, time: '10:00', team1: groupB[0], team2: groupB[1] },
-                { day: 1, time: '11:00', team1: groupB[2], team2: groupB[3] },
-                { day: 2, time: '10:00', team1: groupB[0], team2: groupB[2] },
-                { day: 2, time: '11:00', team1: groupB[1], team2: groupB[3] },
-                { day: 3, time: '10:00', team1: groupB[0], team2: groupB[3] },
-                { day: 3, time: '11:00', team1: groupB[1], team2: groupB[2] }
+                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupB[0], team2: groupB[1] },
+                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupB[2], team2: groupB[3] },
+                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupB[0], team2: groupB[2] },
+                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupB[1], team2: groupB[3] },
+                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupB[0], team2: groupB[3] },
+                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupB[1], team2: groupB[2] }
             ];
             
             return { groupA: groupAMatches, groupB: groupBMatches };
@@ -302,8 +377,8 @@
         
         // Khởi tạo giải đấu
         function initializeTournament() {
-            const teams = createTeams(people);
-            const groups = divideIntoGroups(teams);
+            // Lấy các đội cố định
+            const groups = getFixedGroups();
             
             // Hiển thị các đội trong bảng
             displayTeams('groupA-teams', groups.groupA);
@@ -335,7 +410,7 @@
             schedule.groupA.forEach(match => {
                 html += `
                     <div class="match">
-                        <div class="match-date">Ngày ${match.day} - ${getDateString(match.day)}</div>
+                        <div class="match-date">Ngày ${match.day} - ${match.date}</div>
                         <div class="match-teams">
                             <span>${match.team1}</span>
                             <span class="vs">VS</span>
@@ -351,7 +426,7 @@
             schedule.groupB.forEach(match => {
                 html += `
                     <div class="match">
-                        <div class="match-date">Ngày ${match.day} - ${getDateString(match.day)}</div>
+                        <div class="match-date">Ngày ${match.day} - ${match.date}</div>
                         <div class="match-teams">
                             <span>${match.team1}</span>
                             <span class="vs">VS</span>
@@ -371,7 +446,7 @@
             const semiContainer = document.getElementById('semi-finals');
             semiContainer.innerHTML = `
                 <div class="bracket-match">
-                    <div class="match-date">Ngày 4 - ${getDateString(4)}</div>
+                    <div class="match-date">Ngày 4 - ${FIXED_SCHEDULE.day4}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>Nhất Bảng A</div>
                         <div class="vs">VS</div>
@@ -380,7 +455,7 @@
                 </div>
                 <div class="arrow">→</div>
                 <div class="bracket-match">
-                    <div class="match-date">Ngày 4 - ${getDateString(4)}</div>
+                    <div class="match-date">Ngày 4 - ${FIXED_SCHEDULE.day4}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>Nhất Bảng B</div>
                         <div class="vs">VS</div>
@@ -393,29 +468,14 @@
             const finalContainer = document.getElementById('final');
             finalContainer.innerHTML = `
                 <div class="bracket-match final-match">
-                    <div class="match-date">Ngày 5 - ${getDateString(5)}</div>
+                    <div class="match-date">Ngày 5 - ${FIXED_SCHEDULE.day5}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 15px; font-size: 1.2em;">
                         <div>Đội thắng Bán kết 1</div>
-                        <div class="vs">🏆 VS 🏆</div>
+                        <div class="vs"> VS </div>
                         <div>Đội thắng Bán kết 2</div>
                     </div>
                 </div>
             `;
-        }
-        
-        // Lấy ngày tháng (giả sử bắt đầu từ hôm nay)
-        function getDateString(dayOffset) {
-            const today = new Date();
-            const matchDate = new Date(today);
-            matchDate.setDate(today.getDate() + dayOffset - 1);
-            
-            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            const dayName = days[matchDate.getDay()];
-            const date = matchDate.getDate();
-            const month = matchDate.getMonth() + 1;
-            const year = matchDate.getFullYear();
-            
-            return `${dayName}, ${date}/${month}/${year}`;
         }
         
         // Khởi tạo khi trang được tải
