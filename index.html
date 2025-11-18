@@ -245,8 +245,86 @@
             font-weight: bold;
         }
         
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .results-table {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        
+        .results-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .results-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .results-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .results-table .rank {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .results-table .team-name {
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .results-table .points {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.1em;
+        }
+        
+        .match-result {
+            background: #e8f5e9;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        
+        .match-result.winner {
+            background: #c8e6c9;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .groups-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-container {
                 grid-template-columns: 1fr;
             }
             
@@ -256,6 +334,15 @@
             
             .arrow {
                 transform: rotate(90deg);
+            }
+            
+            .results-table {
+                font-size: 0.85em;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 8px 4px;
             }
         }
     </style>
@@ -295,6 +382,51 @@
             <div class="group group-b">
                 <div class="group-title">BẢNG B</div>
                 <div id="groupB-teams"></div>
+            </div>
+        </div>
+        
+        <div class="stage">
+            <div class="stage-title">KẾT QUẢ THI ĐẤU</div>
+            <div class="results-container">
+                <div class="results-table">
+                    <div class="group-title" style="background: #4CAF50; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                        BẢNG A
+                    </div>
+                    <table id="results-table-a">
+                        <thead>
+                            <tr>
+                                <th>Hạng</th>
+                                <th>Đội</th>
+                                <th>Trận</th>
+                                <th>Thắng</th>
+                                <th>Hòa</th>
+                                <th>Thua</th>
+                                <th>Điểm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body-a"></tbody>
+                    </table>
+                </div>
+                
+                <div class="results-table">
+                    <div class="group-title" style="background: #2196F3; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                        BẢNG B
+                    </div>
+                    <table id="results-table-b">
+                        <thead>
+                            <tr>
+                                <th>Hạng</th>
+                                <th>Đội</th>
+                                <th>Trận</th>
+                                <th>Thắng</th>
+                                <th>Hòa</th>
+                                <th>Thua</th>
+                                <th>Điểm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body-b"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         
@@ -341,11 +473,25 @@
         
         // Lịch thi đấu cố định
         const FIXED_SCHEDULE = {
-            day1: 'Thứ Hai, 01/01/2024',
-            day2: 'Thứ Ba, 02/01/2024',
-            day3: 'Thứ Tư, 03/01/2024',
-            day4: 'Thứ Năm, 04/01/2024',  // Bán kết
-            day5: 'Thứ Sáu, 05/01/2024'    // Chung kết
+            day1: 'Thứ Hai, 17/11/2025',
+            day2: 'Thứ Ba, 18/11/2025',
+            day3: 'Thứ Tư, 19/11/2025',
+            day4: 'Thứ Năm, 20/11/2025',  // Bán kết
+            day5: 'Thứ Sáu, 21/11/2025'    // Chung kết
+        };
+        
+        // Kết quả thi đấu
+        const MATCH_RESULTS = {
+            groupA: [],
+            groupB: [
+                {
+                    team1: 'bạn T.Duy & em D.Kiên',
+                    team2: 'em Sơn & em Tú',
+                    score1: 2,
+                    score2: 0,
+                    winner: 'bạn T.Duy & em D.Kiên'
+                }
+            ]
         };
         
         // Tạo lịch thi đấu vòng bảng
@@ -375,6 +521,79 @@
             return { groupA: groupAMatches, groupB: groupBMatches };
         }
         
+        // Tính toán kết quả bảng
+        function calculateGroupResults(group, results) {
+            const standings = {};
+            
+            // Khởi tạo standings cho tất cả các đội
+            group.forEach(team => {
+                standings[team] = {
+                    team: team,
+                    played: 0,
+                    wins: 0,
+                    draws: 0,
+                    losses: 0,
+                    points: 0
+                };
+            });
+            
+            // Cập nhật standings từ kết quả
+            results.forEach(match => {
+                const team1 = match.team1;
+                const team2 = match.team2;
+                
+                if (standings[team1] && standings[team2]) {
+                    standings[team1].played++;
+                    standings[team2].played++;
+                    
+                    if (match.score1 > match.score2) {
+                        // Team 1 thắng
+                        standings[team1].wins++;
+                        standings[team1].points += 2;
+                        standings[team2].losses++;
+                    } else if (match.score1 < match.score2) {
+                        // Team 2 thắng
+                        standings[team2].wins++;
+                        standings[team2].points += 2;
+                        standings[team1].losses++;
+                    } else {
+                        // Hòa
+                        standings[team1].draws++;
+                        standings[team1].points += 1;
+                        standings[team2].draws++;
+                        standings[team2].points += 1;
+                    }
+                }
+            });
+            
+            // Chuyển đổi thành mảng và sắp xếp
+            const sorted = Object.values(standings).sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                return a.team.localeCompare(b.team);
+            });
+            
+            return sorted;
+        }
+        
+        // Hiển thị bảng kết quả
+        function displayResults(group, results, containerId) {
+            const standings = calculateGroupResults(group, results);
+            const container = document.getElementById(containerId);
+            
+            container.innerHTML = standings.map((team, index) => `
+                <tr>
+                    <td class="rank">${index + 1}</td>
+                    <td class="team-name">${team.team}</td>
+                    <td>${team.played}</td>
+                    <td>${team.wins}</td>
+                    <td>${team.draws}</td>
+                    <td>${team.losses}</td>
+                    <td class="points">${team.points}</td>
+                </tr>
+            `).join('');
+        }
+        
         // Khởi tạo giải đấu
         function initializeTournament() {
             // Lấy các đội cố định
@@ -383,6 +602,10 @@
             // Hiển thị các đội trong bảng
             displayTeams('groupA-teams', groups.groupA);
             displayTeams('groupB-teams', groups.groupB);
+            
+            // Hiển thị bảng kết quả
+            displayResults(groups.groupA, MATCH_RESULTS.groupA, 'results-body-a');
+            displayResults(groups.groupB, MATCH_RESULTS.groupB, 'results-body-b');
             
             // Tạo lịch thi đấu
             const schedule = createGroupStageSchedule(groups.groupA, groups.groupB);
@@ -400,6 +623,17 @@
             ).join('');
         }
         
+        // Tìm kết quả trận đấu
+        function findMatchResult(team1, team2, results) {
+            for (let result of results) {
+                if ((result.team1 === team1 && result.team2 === team2) ||
+                    (result.team1 === team2 && result.team2 === team1)) {
+                    return result;
+                }
+            }
+            return null;
+        }
+        
         // Hiển thị lịch thi đấu vòng bảng
         function displayGroupStage(schedule) {
             const container = document.getElementById('group-stage-matches');
@@ -408,6 +642,13 @@
             // Bảng A
             html += '<div class="group group-a" style="margin-bottom: 20px;"><div class="group-title">BẢNG A</div>';
             schedule.groupA.forEach(match => {
+                const result = findMatchResult(match.team1, match.team2, MATCH_RESULTS.groupA);
+                let resultHtml = '';
+                if (result) {
+                    resultHtml = `<div class="match-result ${result.winner === match.team1 ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #e8f5e9; border-radius: 5px;">
+                        <strong>Kết quả:</strong> ${match.team1} <strong>${result.score1}-${result.score2}</strong> ${match.team2}
+                    </div>`;
+                }
                 html += `
                     <div class="match">
                         <div class="match-date">Ngày ${match.day} - ${match.date}</div>
@@ -416,6 +657,7 @@
                             <span class="vs">VS</span>
                             <span>${match.team2}</span>
                         </div>
+                        ${resultHtml}
                     </div>
                 `;
             });
@@ -424,6 +666,15 @@
             // Bảng B
             html += '<div class="group group-b"><div class="group-title">BẢNG B</div>';
             schedule.groupB.forEach(match => {
+                const result = findMatchResult(match.team1, match.team2, MATCH_RESULTS.groupB);
+                let resultHtml = '';
+                if (result) {
+                    // Xác định đội thắng để highlight
+                    const isTeam1Winner = result.winner === match.team1;
+                    resultHtml = `<div class="match-result ${isTeam1Winner ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #e8f5e9; border-radius: 5px;">
+                        <strong>Kết quả:</strong> ${match.team1} <strong>${result.score1}-${result.score2}</strong> ${match.team2}
+                    </div>`;
+                }
                 html += `
                     <div class="match">
                         <div class="match-date">Ngày ${match.day} - ${match.date}</div>
@@ -432,6 +683,7 @@
                             <span class="vs">VS</span>
                             <span>${match.team2}</span>
                         </div>
+                        ${resultHtml}
                     </div>
                 `;
             });
