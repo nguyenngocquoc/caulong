@@ -451,18 +451,20 @@
         function getFixedGroups() {
             // BẢNG A
             const groupA = [
-                'bạn Phúc & Quốc',
-                'anh Phương & anh Hải',
-                'em M.Kiên & anh Mạnh',
-                'anh Vĩnh & em Toàn'
+                'Phương-Thảo',
+                'Tú-P.Phương',
+                'D.Kiên-Hải',
+                'Phúc-T.Như',
+                'Quốc-Duyên'
             ];
             
             // BẢNG B
             const groupB = [
-                'em Sơn & em Tú',
-                'bạn T.Duy & em D.Kiên',
-                'anh Thường & em Nhật Duy',
-                'anh Phú & anh Đỉnh'
+                'N.Duy-Hà',
+                'T.Duy-Trinh',
+                'Toàn-Thường',
+                'Phú-Sơn',
+                'Vĩnh-Trúc'
             ];
             
             return {
@@ -473,72 +475,52 @@
         
         // Lịch thi đấu cố định
         const FIXED_SCHEDULE = {
-            day1: 'Thứ Hai, 17/11/2025',
-            day2: 'Thứ Ba, 18/11/2025',
-            day3: 'Thứ Tư, 19/11/2025',
-            day4: 'Thứ Năm, 20/11/2025',  // Bán kết
-            day5: 'Thứ Sáu, 21/11/2025'    // Chung kết
+            day1: 'Chưa xác định',
+            day2: 'Chưa xác định',
+            day3: 'Chưa xác định',
+            day4: 'Chưa xác định',  // Bán kết
+            day5: 'Chưa xác định'    // Chung kết
         };
         
         // Kết quả thi đấu
         const MATCH_RESULTS = {
-            groupA: [
-                {
-                    team1: 'em M.Kiên & anh Mạnh',
-                    team2: 'bạn Phúc & Quốc',
-                    score1: 2,
-                    score2: 0,
-                    winner: 'em M.Kiên & anh Mạnh'
-                }
-            ],
-            groupB: [
-                {
-                    team1: 'bạn T.Duy & em D.Kiên',
-                    team2: 'em Sơn & em Tú',
-                    score1: 2,
-                    score2: 0,
-                    winner: 'bạn T.Duy & em D.Kiên'
-                },
-                {
-                    team1: 'bạn T.Duy & em D.Kiên',
-                    team2: 'anh Thường & em Nhật Duy',
-                    score1: 2,
-                    score2: 0,
-                    winner: 'bạn T.Duy & em D.Kiên'
-                },
-                {
-                    team1: 'em Sơn & em Tú',
-                    team2: 'anh Thường & em Nhật Duy',
-                    score1: 1,
-                    score2: 1,
-                    winner: null
-                }
-            ]
+            groupA: [],
+            groupB: []
         };
         
         // Tạo lịch thi đấu vòng bảng
         function createGroupStageSchedule(groupA, groupB) {
             const matches = [];
             
-            // Bảng A - 3 ngày
-            const groupAMatches = [
-                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupA[0], team2: groupA[1] },
-                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupA[2], team2: groupA[3] },
-                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupA[0], team2: groupA[2] },
-                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupA[1], team2: groupA[3] },
-                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupA[0], team2: groupA[3] },
-                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupA[1], team2: groupA[2] }
-            ];
+            // Bảng A - 5 đội, mỗi đội đấu với 4 đội khác = 10 trận
+            const groupAMatches = [];
+            for (let i = 0; i < groupA.length; i++) {
+                for (let j = i + 1; j < groupA.length; j++) {
+                    const matchNumber = groupAMatches.length + 1;
+                    const day = Math.ceil(matchNumber / 2); // 2 trận mỗi ngày
+                    groupAMatches.push({
+                        day: day,
+                        date: FIXED_SCHEDULE['day' + Math.min(day, 5)] || FIXED_SCHEDULE.day1,
+                        team1: groupA[i],
+                        team2: groupA[j]
+                    });
+                }
+            }
             
-            // Bảng B - 3 ngày
-            const groupBMatches = [
-                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupB[0], team2: groupB[1] },
-                { day: 1, date: FIXED_SCHEDULE.day1, team1: groupB[2], team2: groupB[3] },
-                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupB[0], team2: groupB[2] },
-                { day: 2, date: FIXED_SCHEDULE.day2, team1: groupB[1], team2: groupB[3] },
-                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupB[0], team2: groupB[3] },
-                { day: 3, date: FIXED_SCHEDULE.day3, team1: groupB[1], team2: groupB[2] }
-            ];
+            // Bảng B - 5 đội, mỗi đội đấu với 4 đội khác = 10 trận
+            const groupBMatches = [];
+            for (let i = 0; i < groupB.length; i++) {
+                for (let j = i + 1; j < groupB.length; j++) {
+                    const matchNumber = groupBMatches.length + 1;
+                    const day = Math.ceil(matchNumber / 2); // 2 trận mỗi ngày
+                    groupBMatches.push({
+                        day: day,
+                        date: FIXED_SCHEDULE['day' + Math.min(day, 5)] || FIXED_SCHEDULE.day1,
+                        team1: groupB[i],
+                        team2: groupB[j]
+                    });
+                }
+            }
             
             return { groupA: groupAMatches, groupB: groupBMatches };
         }
@@ -671,9 +653,10 @@
                         <strong>Kết quả:</strong> ${match.team1} <strong>${result.score1}-${result.score2}</strong> ${match.team2}
                     </div>`;
                 }
+                const dateDisplay = match.date === 'Chưa xác định' ? 'Chưa xác định' : `Ngày ${match.day} - ${match.date}`;
                 html += `
                     <div class="match">
-                        <div class="match-date">Ngày ${match.day} - ${match.date}</div>
+                        <div class="match-date">${dateDisplay}</div>
                         <div class="match-teams">
                             <span>${match.team1}</span>
                             <span class="vs">VS</span>
@@ -697,9 +680,10 @@
                         <strong>Kết quả:</strong> ${match.team1} <strong>${result.score1}-${result.score2}</strong> ${match.team2}
                     </div>`;
                 }
+                const dateDisplay = match.date === 'Chưa xác định' ? 'Chưa xác định' : `Ngày ${match.day} - ${match.date}`;
                 html += `
                     <div class="match">
-                        <div class="match-date">Ngày ${match.day} - ${match.date}</div>
+                        <div class="match-date">${dateDisplay}</div>
                         <div class="match-teams">
                             <span>${match.team1}</span>
                             <span class="vs">VS</span>
@@ -718,9 +702,10 @@
         function displayKnockoutStage(groupA, groupB) {
             // Bán kết
             const semiContainer = document.getElementById('semi-finals');
+            const semiDate = FIXED_SCHEDULE.day4 === 'Chưa xác định' ? 'Chưa xác định' : `Ngày 4 - ${FIXED_SCHEDULE.day4}`;
             semiContainer.innerHTML = `
                 <div class="bracket-match">
-                    <div class="match-date">Ngày 4 - ${FIXED_SCHEDULE.day4}</div>
+                    <div class="match-date">${semiDate}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>Nhất Bảng A</div>
                         <div class="vs">VS</div>
@@ -729,7 +714,7 @@
                 </div>
                 <div class="arrow">→</div>
                 <div class="bracket-match">
-                    <div class="match-date">Ngày 4 - ${FIXED_SCHEDULE.day4}</div>
+                    <div class="match-date">${semiDate}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>Nhất Bảng B</div>
                         <div class="vs">VS</div>
@@ -740,9 +725,10 @@
             
             // Chung kết
             const finalContainer = document.getElementById('final');
+            const finalDate = FIXED_SCHEDULE.day5 === 'Chưa xác định' ? 'Chưa xác định' : `Ngày 5 - ${FIXED_SCHEDULE.day5}`;
             finalContainer.innerHTML = `
                 <div class="bracket-match final-match">
-                    <div class="match-date">Ngày 5 - ${FIXED_SCHEDULE.day5}</div>
+                    <div class="match-date">${finalDate}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 15px; font-size: 1.2em;">
                         <div>Đội thắng Bán kết 1</div>
                         <div class="vs"> VS </div>
