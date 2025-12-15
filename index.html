@@ -558,7 +558,7 @@
             day5: 'Chưa xác định'    // Chung kết
         };
         const STORAGE_KEY = 'caulong_match_results_v1';
-        const API_BASE = 'https://checkin.nq72.de';
+        const API_BASE = 'https://checkin.nq72.de/api';
         let matchResults = { groupA: [], groupB: [] };
         let schedule = { groupA: [], groupB: [] };
         
@@ -631,18 +631,23 @@
                     standings[team2].scored += match.score2;
                     standings[team2].conceded += match.score1;
 
-                    if (match.score1 > match.score2) {
-                        // Team 1 thắng
+                    const s1t1 = match.set1_team1 ?? match.score1 ?? 0;
+                    const s1t2 = match.set1_team2 ?? match.score2 ?? 0;
+                    const s2t1 = match.set2_team1 ?? 0;
+                    const s2t2 = match.set2_team2 ?? 0;
+                    let setWin1 = 0, setWin2 = 0;
+                    if (s1t1 > s1t2) setWin1++; else if (s1t2 > s1t1) setWin2++;
+                    if (s2t1 > s2t2) setWin1++; else if (s2t2 > s2t1) setWin2++;
+
+                    if (setWin1 > setWin2) {
                         standings[team1].wins++;
                         standings[team1].points += 2;
                         standings[team2].losses++;
-                    } else if (match.score1 < match.score2) {
-                        // Team 2 thắng
+                    } else if (setWin2 > setWin1) {
                         standings[team2].wins++;
                         standings[team2].points += 2;
                         standings[team1].losses++;
                     } else {
-                        // Hòa
                         standings[team1].draws++;
                         standings[team1].points += 1;
                         standings[team2].draws++;
@@ -903,11 +908,15 @@
             }
         }
 
-        // Tính đội thắng dựa trên điểm
-        function computeWinner(score1, score2, team1, team2) {
-            if (score1 > score2) return team1;
-            if (score2 > score1) return team2;
-            return null;
+        // Tính đội thắng dựa trên số set thắng (2 set vòng bảng; hòa nếu mỗi đội thắng 1 set)
+        function computeWinnerBySets(s1t1, s1t2, s2t1, s2t2, team1, team2) {
+            let setWin1 = 0;
+            let setWin2 = 0;
+            if (s1t1 > s1t2) setWin1++; else if (s1t2 > s1t1) setWin2++;
+            if (s2t1 > s2t2) setWin1++; else if (s2t2 > s2t1) setWin2++;
+            if (setWin1 > setWin2) return team1;
+            if (setWin2 > setWin1) return team2;
+            return null; // hòa
         }
 
         // Form cập nhật kết quả
@@ -957,7 +966,7 @@
 
                 const total1 = s1t1 + s2t1;
                 const total2 = s1t2 + s2t2;
-                const winner = computeWinner(total1, total2, match.team1, match.team2);
+                const winner = computeWinnerBySets(s1t1, s1t2, s2t1, s2t2, match.team1, match.team2);
                 // Cập nhật hoặc thêm mới
                 const list = matchResults[groupKey];
                 const idx = list.findIndex(r =>
