@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Times New Roman', Times, serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a4d2e;
             padding: 20px;
             min-height: 100vh;
         }
@@ -43,11 +43,11 @@
         }
         
         .rules {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #2d5a3d;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 30px;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #ffd700;
         }
         
         .rules-title {
@@ -72,7 +72,7 @@
         }
         
         .rule-item h3 {
-            color: #667eea;
+            color: #ffd700;
             margin-bottom: 10px;
             font-size: 1.1em;
         }
@@ -89,7 +89,7 @@
         
         .rule-item li:before {
             content: "• ";
-            color: #667eea;
+            color: #ffd700;
             font-weight: bold;
             margin-right: 5px;
         }
@@ -115,11 +115,11 @@
         }
         
         .group-a {
-            border-color: #4CAF50;
+            border-color: #ffd700;
         }
         
         .group-b {
-            border-color: #2196F3;
+            border-color: #ffd700;
         }
         
         .group-title {
@@ -132,13 +132,13 @@
         }
         
         .group-a .group-title {
-            background: #4CAF50;
-            color: white;
+            background: #1a4d2e;
+            color: #ffd700;
         }
         
         .group-b .group-title {
-            background: #2196F3;
-            color: white;
+            background: #1a4d2e;
+            color: #ffd700;
         }
         
         .team {
@@ -151,11 +151,11 @@
         }
         
         .group-a .team {
-            border-left-color: #4CAF50;
+            border-left-color: #ffd700;
         }
         
         .group-b .team {
-            border-left-color: #2196F3;
+            border-left-color: #ffd700;
         }
         
         .match {
@@ -201,11 +201,10 @@
             font-size: 1.125em;
             font-weight: bold;
             text-align: center;
-            color: #333;
+            color: #ffd700;
             margin-bottom: 25px;
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #1a4d2e;
             border-radius: 10px;
         }
         
@@ -222,15 +221,15 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            border: 3px solid #667eea;
+            border: 3px solid #ffd700;
             min-width: 250px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .final-match {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: 4px solid #ff6b6b;
+            background: #1a4d2e;
+            color: #ffd700;
+            border: 4px solid #ffd700;
             min-width: 300px;
         }
         
@@ -241,7 +240,7 @@
         
         .arrow {
             font-size: 2em;
-            color: #667eea;
+            color: #ffd700;
             font-weight: bold;
         }
         
@@ -267,12 +266,12 @@
         }
         
         .results-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #1a4d2e;
+            color: #ffd700;
             padding: 12px 8px;
             text-align: center;
             font-weight: bold;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,215,0,0.3);
         }
         
         .results-table td {
@@ -286,12 +285,12 @@
         }
         
         .results-table tr:hover {
-            background: #e3f2fd;
+            background: #2d5a3d;
         }
         
         .results-table .rank {
             font-weight: bold;
-            color: #667eea;
+            color: #1a4d2e;
         }
         
         .results-table .team-name {
@@ -302,21 +301,23 @@
         
         .results-table .points {
             font-weight: bold;
-            color: #4CAF50;
+            color: #ffd700;
             font-size: 1.1em;
         }
         
         .match-result {
-            background: #e8f5e9;
+            background: #2d5a3d;
             padding: 8px;
             border-radius: 5px;
             margin: 5px 0;
             font-size: 0.9em;
+            color: white;
         }
         
         .match-result.winner {
-            background: #c8e6c9;
+            background: #1a4d2e;
             font-weight: bold;
+            color: #ffd700;
         }
         /* Form cập nhật kết quả */
         .result-editor {
@@ -348,8 +349,8 @@
             font-size: 14px;
         }
         .result-editor button {
-            background: linear-gradient(135deg, #2196f3, #1e88e5);
-            color: #fff;
+            background: #ffd700;
+            color: #1a4d2e;
             border: none;
             border-radius: 6px;
             padding: 10px 16px;
@@ -401,7 +402,7 @@
         <p class="subtitle">Lịch thi đấu và sơ đồ giải đấu</p>
         
         <div class="rules">
-            <div class="rules-title">THỂ LỆ THI ĐẤU</div>
+            <div style="color: #ffd700;" class="rules-title">THỂ LỆ THI ĐẤU</div>
             <div class="rules-content">
                 <div class="rule-item">
                     <h3>VÒNG LOẠI (Vòng Bảng)</h3>
@@ -437,7 +438,7 @@
             <div class="stage-title">KẾT QUẢ THI ĐẤU</div>
             <div class="results-container">
                 <div class="results-table">
-                    <div class="group-title" style="background: #4CAF50; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    <div class="group-title" style="background: #1a4d2e; color: #ffd700; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
                         BẢNG A
                     </div>
                     <table id="results-table-a">
@@ -458,7 +459,7 @@
                 </div>
                 
                 <div class="results-table">
-                    <div class="group-title" style="background: #2196F3; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    <div class="group-title" style="background: #1a4d2e; color: #ffd700; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
                         BẢNG B
                     </div>
                     <table id="results-table-b">
@@ -558,7 +559,7 @@
             day5: 'Chưa xác định'    // Chung kết
         };
         const STORAGE_KEY = 'caulong_match_results_v1';
-        const API_BASE = 'https://checkin.nq72.de/api';
+        const API_BASE = 'https://checkin.nq72.de';
         let matchResults = { groupA: [], groupB: [] };
         let schedule = { groupA: [], groupB: [] };
         
@@ -752,8 +753,8 @@
                     const s1t2 = result.set1_team2 ?? 0;
                     const s2t1 = result.set2_team1 ?? 0;
                     const s2t2 = result.set2_team2 ?? 0;
-                    resultHtml = `<div class="match-result ${result.winner === match.team1 ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #e8f5e9; border-radius: 5px;">
-                        <span style="font-size: 0.95em; color:#444;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
+                    resultHtml = `<div class="match-result ${result.winner === match.team1 ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #2d5a3d; border-radius: 5px;">
+                        <span style="font-size: 0.95em; color:white;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
                     </div>`;
                 }
                 html += `
@@ -781,8 +782,8 @@
                     const s1t2 = result.set1_team2 ?? 0;
                     const s2t1 = result.set2_team1 ?? 0;
                     const s2t2 = result.set2_team2 ?? 0;
-                    resultHtml = `<div class="match-result ${isTeam1Winner ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #e8f5e9; border-radius: 5px;">
-                        <span style="font-size: 0.95em; color:#444;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
+                    resultHtml = `<div class="match-result ${isTeam1Winner ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #2d5a3d; border-radius: 5px;">
+                        <span style="font-size: 0.95em; color:white;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
                     </div>`;
                 }
                 html += `
