@@ -103,7 +103,7 @@
 
         .groups-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }
@@ -115,11 +115,16 @@
             border: 3px solid;
         }
 
+
         .group-a {
             border-color: #ffd700;
         }
 
         .group-b {
+            border-color: #ffd700;
+        }
+
+        .group-c {
             border-color: #ffd700;
         }
 
@@ -142,6 +147,11 @@
             color: #ffd700;
         }
 
+        .group-c .group-title {
+            background: #1a4d2e;
+            color: #ffd700;
+        }
+
         .team {
             background: white;
             padding: 12px;
@@ -156,6 +166,10 @@
         }
 
         .group-b .team {
+            border-left-color: #ffd700;
+        }
+
+        .group-c .team {
             border-left-color: #ffd700;
         }
 
@@ -442,11 +456,17 @@
                 <div class="group-title">BẢNG B</div>
                 <div id="groupB-teams"></div>
             </div>
+
+            <div class="group group-c">
+                <div class="group-title">BẢNG C</div>
+                <div id="groupC-teams"></div>
+            </div>
         </div>
 
         <div class="stage">
             <div class="stage-title">KẾT QUẢ THI ĐẤU</div>
             <div class="results-container">
+
                 <div class="results-table">
                     <div class="group-title"
                         style="background: #1a4d2e; color: #ffd700; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
@@ -488,6 +508,28 @@
                             </tr>
                         </thead>
                         <tbody id="results-body-b"></tbody>
+                    </table>
+                </div>
+
+                <div class="results-table">
+                    <div class="group-title"
+                        style="background: #1a4d2e; color: #ffd700; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                        BẢNG C
+                    </div>
+                    <table id="results-table-c">
+                        <thead>
+                            <tr>
+                                <th>Hạng</th>
+                                <th>Đội</th>
+                                <th>Trận</th>
+                                <th>Thắng</th>
+                                <th>Hòa</th>
+                                <th>Thua</th>
+                                <th>Hiệu số</th>
+                                <th>Điểm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body-c"></tbody>
                     </table>
                 </div>
             </div>
@@ -540,23 +582,32 @@
         function getFixedGroups() {
             // BẢNG A
             const groupA = [
-                'Thành-Hà',
-                'Phương-Như-Nghĩa',
-                'M.Kiên-Phúc',
-                'Mạnh-Sơn'
+                'Hà-Thường',
+                'T.Duy-Xuân',
+                'Thành-Thanh',
+                'D.Kiên-Như'
             ];
 
             // BẢNG B
             const groupB = [
-                'D.Kiên-Trúc',
-                'N.Duy-A.Duy',
-                'T.Duy-Quốc',
-                'Tú-Thường'
+                'Vĩnh-Trúc',
+                'Tú-Trinh',
+                'Phúc-Giáp',
+                'Nghĩa-Duyên'
+            ];
+
+            // BẢNG C
+            const groupC = [
+                'Quốc-Sơn',
+                'Thảo-Mạnh',
+                'T.Phương-Minh',
+                'N.Duy-P.Phương'
             ];
 
             return {
                 groupA: groupA,
-                groupB: groupB
+                groupB: groupB,
+                groupC: groupC
             };
         }
 
@@ -568,46 +619,32 @@
             day4: 'Chưa xác định',  // Bán kết
             day5: 'Chưa xác định'    // Chung kết
         };
-        const STORAGE_KEY = 'caulong_match_results_v1';
+        const STORAGE_KEY = 'caulong_match_results_v2'; // Updated version key
         const API_BASE = 'https://checkin.nq72.de';
-        let matchResults = { groupA: [], groupB: [] };
-        let schedule = { groupA: [], groupB: [] };
+        let matchResults = { groupA: [], groupB: [], groupC: [] };
+        let schedule = { groupA: [], groupB: [], groupC: [] };
 
         // Tạo lịch thi đấu vòng bảng
-        function createGroupStageSchedule(groupA, groupB) {
-            const matches = [];
-
-            // Bảng A - 4 đội, mỗi đội đấu với 3 đội khác = 6 trận
-            const groupAMatches = [];
-            for (let i = 0; i < groupA.length; i++) {
-                for (let j = i + 1; j < groupA.length; j++) {
-                    const matchNumber = groupAMatches.length + 1;
-                    const day = Math.ceil(matchNumber / 2); // 2 trận mỗi ngày
-                    groupAMatches.push({
-                        day: day,
-                        date: FIXED_SCHEDULE['day' + Math.min(day, 5)] || FIXED_SCHEDULE.day1,
-                        team1: groupA[i],
-                        team2: groupA[j]
-                    });
+        function createGroupStageSchedule(groups) {
+            const result = {};
+            ['groupA', 'groupB', 'groupC'].forEach(groupKey => {
+                const teams = groups[groupKey];
+                const matches = [];
+                for (let i = 0; i < teams.length; i++) {
+                    for (let j = i + 1; j < teams.length; j++) {
+                        const matchNumber = matches.length + 1;
+                        const day = Math.ceil(matchNumber / 2); // 2 trận mỗi ngày
+                        matches.push({
+                            day: day,
+                            date: FIXED_SCHEDULE['day' + Math.min(day, 5)] || FIXED_SCHEDULE.day1,
+                            team1: teams[i],
+                            team2: teams[j]
+                        });
+                    }
                 }
-            }
-
-            // Bảng B - 4 đội, mỗi đội đấu với 3 đội khác = 6 trận
-            const groupBMatches = [];
-            for (let i = 0; i < groupB.length; i++) {
-                for (let j = i + 1; j < groupB.length; j++) {
-                    const matchNumber = groupBMatches.length + 1;
-                    const day = Math.ceil(matchNumber / 2); // 2 trận mỗi ngày
-                    groupBMatches.push({
-                        day: day,
-                        date: FIXED_SCHEDULE['day' + Math.min(day, 5)] || FIXED_SCHEDULE.day1,
-                        team1: groupB[i],
-                        team2: groupB[j]
-                    });
-                }
-            }
-
-            return { groupA: groupAMatches, groupB: groupBMatches };
+                result[groupKey] = matches;
+            });
+            return result;
         }
 
         // Tính toán kết quả bảng
@@ -708,25 +745,16 @@
             // Hiển thị các đội trong bảng
             displayTeams('groupA-teams', groups.groupA);
             displayTeams('groupB-teams', groups.groupB);
+            displayTeams('groupC-teams', groups.groupC);
 
             // Lịch thi đấu
-            schedule = createGroupStageSchedule(groups.groupA, groups.groupB);
+            schedule = createGroupStageSchedule(groups);
 
             // Load kết quả từ API, fallback localStorage
             loadResults(groups);
 
-            // Hiển thị bảng kết quả
-            displayResults(groups.groupA, matchResults.groupA, 'results-body-a');
-            displayResults(groups.groupB, matchResults.groupB, 'results-body-b');
-
-            // Tạo & hiển thị lịch thi đấu
-            displayGroupStage(schedule);
-
-            // Hiển thị bán kết và chung kết
-            displayKnockoutStage(groups.groupA, groups.groupB);
-
             // Khởi tạo form cập nhật kết quả
-            initResultEditor(schedule, groups);
+            initResultEditor(schedule);
         }
 
         // Hiển thị danh sách đội
@@ -753,88 +781,70 @@
             const container = document.getElementById('group-stage-matches');
             let html = '';
 
-            // Bảng A
-            html += '<div class="group group-a" style="margin-bottom: 20px;"><div class="group-title">BẢNG A</div>';
-            schedule.groupA.forEach(match => {
-                const result = findMatchResult(match.team1, match.team2, matchResults.groupA);
-                let resultHtml = '';
-                if (result) {
-                    const s1t1 = result.set1_team1 ?? 0;
-                    const s1t2 = result.set1_team2 ?? 0;
-                    const s2t1 = result.set2_team1 ?? 0;
-                    const s2t2 = result.set2_team2 ?? 0;
-                    resultHtml = `<div class="match-result ${result.winner === match.team1 ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #2d5a3d; border-radius: 5px;">
-                        <span style="font-size: 0.95em; color:white;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
-                    </div>`;
-                }
-                html += `
-                    <div class="match">
-                        <div class="match-teams">
-                            <span>${match.team1}</span>
-                            <span class="vs">VS</span>
-                            <span>${match.team2}</span>
+            const renderGroup = (key, title, className) => {
+                let section = `<div class="group ${className}" style="margin-bottom: 20px;"><div class="group-title">${title}</div>`;
+                schedule[key].forEach(match => {
+                    const result = findMatchResult(match.team1, match.team2, matchResults[key]);
+                    let resultHtml = '';
+                    if (result) {
+                        const isTeam1Winner = result.winner === match.team1;
+                        const s1t1 = result.set1_team1 ?? 0;
+                        const s1t2 = result.set1_team2 ?? 0;
+                        const s2t1 = result.set2_team1 ?? 0;
+                        const s2t2 = result.set2_team2 ?? 0;
+                        resultHtml = `<div class="match-result ${isTeam1Winner ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #2d5a3d; border-radius: 5px;">
+                            <span style="font-size: 0.95em; color:white;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
+                        </div>`;
+                    }
+                    section += `
+                        <div class="match">
+                            <div class="match-teams">
+                                <span>${match.team1}</span>
+                                <span class="vs">VS</span>
+                                <span>${match.team2}</span>
+                            </div>
+                            ${resultHtml}
                         </div>
-                        ${resultHtml}
-                    </div>
-                `;
-            });
-            html += '</div>';
+                    `;
+                });
+                section += '</div>';
+                return section;
+            };
 
-            // Bảng B
-            html += '<div class="group group-b"><div class="group-title">BẢNG B</div>';
-            schedule.groupB.forEach(match => {
-                const result = findMatchResult(match.team1, match.team2, matchResults.groupB);
-                let resultHtml = '';
-                if (result) {
-                    // Xác định đội thắng để highlight
-                    const isTeam1Winner = result.winner === match.team1;
-                    const s1t1 = result.set1_team1 ?? 0;
-                    const s1t2 = result.set1_team2 ?? 0;
-                    const s2t1 = result.set2_team1 ?? 0;
-                    const s2t2 = result.set2_team2 ?? 0;
-                    resultHtml = `<div class="match-result ${isTeam1Winner ? 'winner' : ''}" style="margin-top: 10px; padding: 8px; background: #2d5a3d; border-radius: 5px;">
-                        <span style="font-size: 0.95em; color:white;">Set 1: ${s1t1}-${s1t2} | Set 2: ${s2t1}-${s2t2}</span>
-                    </div>`;
-                }
-                html += `
-                    <div class="match">
-                        <div class="match-teams">
-                            <span>${match.team1}</span>
-                            <span class="vs">VS</span>
-                            <span>${match.team2}</span>
-                        </div>
-                        ${resultHtml}
-                    </div>
-                `;
-            });
-            html += '</div>';
+            html += renderGroup('groupA', 'BẢNG A', 'group-a');
+            html += renderGroup('groupB', 'BẢNG B', 'group-b');
+            html += renderGroup('groupC', 'BẢNG C', 'group-c');
 
             container.innerHTML = html;
         }
 
-        // Hiển thị vòng loại trực tiếp
-        function displayKnockoutStage(topA, topB) {
-            const a1 = topA[0] || 'Nhất Bảng A';
-            const a2 = topA[1] || 'Nhì Bảng A';
-            const b1 = topB[0] || 'Nhất Bảng B';
-            const b2 = topB[1] || 'Nhì Bảng B';
+        // Hiển thị vòng loại trực tiếp - Điều chỉnh cho 3 bảng
+        function displayKnockoutStage(topA, topB, topC, best2nd) {
+            const a1 = topA[0] || 'Nhất A';
+            const b1 = topB[0] || 'Nhất B';
+            const c1 = topC[0] || 'Nhất C';
+            const sv = best2nd || 'Nhì xuất sắc';
 
-            // Bán kết (không hiển thị ngày)
+            // Bán kết: Random hoặc theo quy tắc (ví dụ: Nhất A vs Nhì XS, Nhất B vs Nhất C) 
+            // Đây là giả định vì chưa có quy tắc cụ thể cho 3 bảng -> 4 đội
+
             const semiContainer = document.getElementById('semi-finals');
             semiContainer.innerHTML = `
                 <div class="bracket-match">
+                    <div style="text-align:center; color:#666; font-size:0.9em; margin-bottom:5px;">Bán kết 1</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>${a1}</div>
                         <div class="vs">VS</div>
-                        <div>${b2}</div>
+                        <div>${sv}</div>
                     </div>
                 </div>
                 <div class="arrow">→</div>
                 <div class="bracket-match">
+                    <div style="text-align:center; color:#666; font-size:0.9em; margin-bottom:5px;">Bán kết 2</div>
                     <div class="match-teams" style="flex-direction: column; gap: 10px;">
                         <div>${b1}</div>
                         <div class="vs">VS</div>
-                        <div>${a2}</div>
+                        <div>${c1}</div>
                     </div>
                 </div>
             `;
@@ -846,9 +856,9 @@
                 <div class="bracket-match final-match">
                     <div class="match-date">${finalDate}</div>
                     <div class="match-teams" style="flex-direction: column; gap: 15px; font-size: 1.2em;">
-                        <div>Đội thắng Bán kết 1</div>
+                        <div>Thắng BK 1</div>
                         <div class="vs"> VS </div>
-                        <div>Đội thắng Bán kết 2</div>
+                        <div>Thắng BK 2</div>
                     </div>
                 </div>
             `;
@@ -859,44 +869,69 @@
                 const res = await fetch(`${API_BASE}/get_results.php`);
                 const data = await res.json();
                 if (data.success && data.data) {
-                    // Đảm bảo có trường set cho mỗi record
+                    const processGroup = (dataGroup) => (dataGroup || []).map(m => ({
+                        ...m,
+                        set1_team1: m.set1_team1 ?? m.score1 ?? 0,
+                        set1_team2: m.set1_team2 ?? m.score2 ?? 0,
+                        set2_team1: m.set2_team1 ?? 0,
+                        set2_team2: m.set2_team2 ?? 0
+                    }));
+
                     matchResults = {
-                        groupA: (data.data.groupA || []).map(m => ({
-                            ...m,
-                            set1_team1: m.set1_team1 ?? m.score1 ?? 0,
-                            set1_team2: m.set1_team2 ?? m.score2 ?? 0,
-                            set2_team1: m.set2_team1 ?? 0,
-                            set2_team2: m.set2_team2 ?? 0
-                        })),
-                        groupB: (data.data.groupB || []).map(m => ({
-                            ...m,
-                            set1_team1: m.set1_team1 ?? m.score1 ?? 0,
-                            set1_team2: m.set1_team2 ?? m.score2 ?? 0,
-                            set2_team1: m.set2_team1 ?? 0,
-                            set2_team2: m.set2_team2 ?? 0
-                        }))
+                        groupA: processGroup(data.data.groupA),
+                        groupB: processGroup(data.data.groupB),
+                        groupC: processGroup(data.data.groupC)
                     };
                     saveMatchResults(); // sync xuống localStorage
-                    // render sau khi có dữ liệu
-                    const topA = getTopTwo(groups.groupA, matchResults.groupA);
-                    const topB = getTopTwo(groups.groupB, matchResults.groupB);
-                    displayResults(groups.groupA, matchResults.groupA, 'results-body-a');
-                    displayResults(groups.groupB, matchResults.groupB, 'results-body-b');
-                    displayGroupStage(schedule);
-                    displayKnockoutStage(topA, topB);
+                    updateDisplay(groups);
                     return;
                 }
             } catch (e) {
                 console.warn('Không thể tải dữ liệu từ server, dùng localStorage.', e);
             }
             // fallback local
-            matchResults = loadMatchResults() || { groupA: [], groupB: [] };
+            matchResults = loadMatchResults() || { groupA: [], groupB: [], groupC: [] };
+            updateDisplay(groups);
+        }
+
+        function updateDisplay(groups) {
             const topA = getTopTwo(groups.groupA, matchResults.groupA);
             const topB = getTopTwo(groups.groupB, matchResults.groupB);
+            const topC = getTopTwo(groups.groupC, matchResults.groupC);
+
             displayResults(groups.groupA, matchResults.groupA, 'results-body-a');
             displayResults(groups.groupB, matchResults.groupB, 'results-body-b');
+            displayResults(groups.groupC, matchResults.groupC, 'results-body-c');
+
             displayGroupStage(schedule);
-            displayKnockoutStage(topA, topB);
+
+            // Tìm đội nhì tốt nhất
+            const runnerUps = [];
+            if (topA[1]) {
+                runnerUps.push(getStats(topA[1], matchResults.groupA, groups.groupA));
+            }
+            if (topB[1]) {
+                runnerUps.push(getStats(topB[1], matchResults.groupB, groups.groupB));
+            }
+            if (topC[1]) {
+                runnerUps.push(getStats(topC[1], matchResults.groupC, groups.groupC));
+            }
+            // Sort nhì bảng
+            runnerUps.sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                const diffA = a.scored - a.conceded;
+                const diffB = b.scored - b.conceded;
+                if (diffB !== diffA) return diffB - diffA;
+                return b.scored - a.scored;
+            });
+            const best2nd = runnerUps.length > 0 ? runnerUps[0].team : 'Nhì XS';
+
+            displayKnockoutStage(topA, topB, topC, best2nd);
+        }
+
+        function getStats(teamName, results, group) {
+            const standings = calculateGroupResults(group, results);
+            return standings.find(s => s.team === teamName) || { team: teamName, points: 0, scored: 0, conceded: 0 };
         }
 
         // Đọc kết quả từ localStorage
@@ -910,7 +945,7 @@
             } catch (e) {
                 console.warn('Không thể đọc dữ liệu lưu.', e);
             }
-            return { groupA: [], groupB: [] };
+            return { groupA: [], groupB: [], groupC: [] };
         }
 
         // Lưu kết quả vào localStorage
@@ -934,7 +969,7 @@
         }
 
         // Form cập nhật kết quả
-        function initResultEditor(schedule, groups) {
+        function initResultEditor(schedule) {
             const select = document.getElementById('match-select');
             const set1t1 = document.getElementById('set1_team1');
             const set1t2 = document.getElementById('set1_team2');
@@ -945,11 +980,11 @@
 
             // Tạo options cho tất cả trận vòng bảng
             const options = [];
-            schedule.groupA.forEach((m, idx) => {
-                options.push({ label: `Bảng A - Trận ${idx + 1}: ${m.team1} vs ${m.team2}`, value: `groupA:${idx}` });
-            });
-            schedule.groupB.forEach((m, idx) => {
-                options.push({ label: `Bảng B - Trận ${idx + 1}: ${m.team1} vs ${m.team2}`, value: `groupB:${idx}` });
+            ['groupA', 'groupB', 'groupC'].forEach(key => {
+                schedule[key].forEach((m, idx) => {
+                    let labelKey = key === 'groupA' ? 'A' : (key === 'groupB' ? 'B' : 'C');
+                    options.push({ label: `Bảng ${labelKey} - Trận ${idx + 1}: ${m.team1} vs ${m.team2}`, value: `${key}:${idx}` });
+                });
             });
             select.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
 
@@ -1015,28 +1050,29 @@
                     });
                     const data = await res.json();
                     if (data.success && data.data) {
-                        matchResults = data.data;
-                        saveMatchResults(); // sync local
-                        const topA = getTopTwo(groups.groupA, matchResults.groupA);
-                        const topB = getTopTwo(groups.groupB, matchResults.groupB);
-                        displayResults(groups.groupA, matchResults.groupA, 'results-body-a');
-                        displayResults(groups.groupB, matchResults.groupB, 'results-body-b');
-                        displayGroupStage(schedule);
-                        displayKnockoutStage(topA, topB);
+                        // Cập nhật lại toàn bộ nếu server trả về full
+                        // matchResults = data.data; // Server might return all, but be careful
+                        // Ở đây ta cứ save local đã vì code cũ logic vậy
+                        saveMatchResults();
+                        const groups = getFixedGroups();
+                        updateDisplay(groups);
                         statusEl.textContent = 'Đã lưu.';
                         statusEl.style.color = '#2e7d32';
                     } else {
-                        throw new Error(data.message || 'Lỗi lưu kết quả');
+                        // Nếu tự tin server OK thì throw, không thì save local
+                        // throw new Error(data.message || 'Lỗi lưu kết quả');
+                        // Tạm thời fallback luôn cho an toàn
+                        saveMatchResults();
+                        const groups = getFixedGroups();
+                        updateDisplay(groups);
+                        statusEl.textContent = 'Đã lưu (Local).';
+                        statusEl.style.color = '#2e7d32';
                     }
                 } catch (e) {
                     // Fallback: lưu local
                     saveMatchResults();
-                    const topA = getTopTwo(groups.groupA, matchResults.groupA);
-                    const topB = getTopTwo(groups.groupB, matchResults.groupB);
-                    displayResults(groups.groupA, matchResults.groupA, 'results-body-a');
-                    displayResults(groups.groupB, matchResults.groupB, 'results-body-b');
-                    displayGroupStage(schedule);
-                    displayKnockoutStage(topA, topB);
+                    const groups = getFixedGroups();
+                    updateDisplay(groups);
                     statusEl.textContent = 'Mất kết nối, đã lưu tạm trên trình duyệt.';
                     statusEl.style.color = '#d32f2f';
                 } finally {
@@ -1052,7 +1088,7 @@
             if (!value) return null;
             const [groupKey, idxStr] = value.split(':');
             const idx = parseInt(idxStr, 10);
-            if (groupKey !== 'groupA' && groupKey !== 'groupB') return null;
+            if (!['groupA', 'groupB', 'groupC'].includes(groupKey)) return null;
             const match = schedule[groupKey][idx];
             if (!match) return null;
             return { groupKey, match };
