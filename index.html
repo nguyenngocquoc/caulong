@@ -691,7 +691,7 @@
         function initSetupEvents() {
             const btn = document.getElementById('btn-create-tournament');
             // Remove old listeners by cloning (simple trick) or just assign onclick
-            btn.onclick = () => {
+            btn.onclick = async () => {
                 const getLines = (id) => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(s => s);
                 const gA = getLines('setup-group-a');
                 const gB = getLines('setup-group-b');
@@ -716,7 +716,7 @@
                     location.reload();
                 }
             };
-            };
+
         }
 
         // Lịch thi đấu cố định
