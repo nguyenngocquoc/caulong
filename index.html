@@ -446,6 +446,33 @@
             </div>
         </div>
 
+
+        <!-- FORM TẠO GIẢI ĐẤU -->
+        <div id="setup-tournament-view" class="result-editor" style="display:none; margin-bottom: 30px; border: 2px solid #1a4d2e;">
+            <h2 style="text-align:center; color:#1a4d2e; margin-bottom: 20px;">TẠO GIẢI ĐẤU MỚI</h2>
+            
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">
+                <div>
+                    <div class="group-title" style="background:#1a4d2e; color:#ffd700; padding:10px; border-radius:5px; text-align:center;">BẢNG A</div>
+                    <textarea id="setup-group-a" rows="8" style="width:100%; padding:10px; border:1px solid #ddd; margin-top:5px;" placeholder="Nhập tên đội (mỗi dòng 1 đội)"></textarea>
+                </div>
+                <div>
+                    <div class="group-title" style="background:#1a4d2e; color:#ffd700; padding:10px; border-radius:5px; text-align:center;">BẢNG B</div>
+                    <textarea id="setup-group-b" rows="8" style="width:100%; padding:10px; border:1px solid #ddd; margin-top:5px;" placeholder="Nhập tên đội (mỗi dòng 1 đội)"></textarea>
+                </div>
+                <div>
+                    <div class="group-title" style="background:#1a4d2e; color:#ffd700; padding:10px; border-radius:5px; text-align:center;">BẢNG C</div>
+                    <textarea id="setup-group-c" rows="8" style="width:100%; padding:10px; border:1px solid #ddd; margin-top:5px;" placeholder="Nhập tên đội (mỗi dòng 1 đội)"></textarea>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:25px;">
+                <button id="btn-create-tournament" style="font-size:1.1em; padding:12px 30px; background:#1a4d2e; color:#ffd700;">TẠO GIẢI ĐẤU</button>
+            </div>
+            <p style="text-align:center; margin-top:10px; font-size:0.9em; color:#666;">Nhập danh sách đội để bắt đầu. Dữ liệu cũ sẽ bị xóa khi tạo mới.</p>
+        </div>
+
+        <div id="main-tournament-view">
         <div class="groups-container">
             <div class="group group-a">
                 <div class="group-title">BẢNG A</div>
@@ -558,7 +585,15 @@
                 <button id="save-result">Lưu kết quả</button>
                 <span id="save-status" class="helper"></span>
             </div>
-            <div class="helper">Dữ liệu lưu server (API) và đồng bộ localStorage.</div>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+            <div style="margin-top: 20px;">
+                <button id="reset-tournament" style="background: #d32f2f; color: white;">RESET GIẢI ĐẤU (TẠO
+                    MỚI)</button>
+                <p class="helper" style="margin-top: 5px; color: #d32f2f;">Lưu ý: Hành động này sẽ xóa toàn bộ kết quả
+                    hiện tại và tạo giải đấu mới.</p>
+            </div>
         </div>
 
         <div class="stage">
@@ -575,11 +610,14 @@
             <div class="stage-title">CHUNG KẾT</div>
             <div class="bracket" id="final"></div>
         </div>
+        </div>
     </div>
 
     <script>
-        // Cố định các đội và bảng theo yêu cầu
-        function getFixedGroups() {
+        const CONFIG_KEY = 'caulong_config_v1';
+
+        // Cố định các đội mặc định (cho form setup)
+        function getDefaultGroups() {
             // BẢNG A
             const groupA = [
                 'T.Duy – Duyên',
@@ -608,6 +646,79 @@
             };
         }
 
+        async function getTournamentGroups() {
+            try {
+                // Try fetching from API first
+                const res = await fetch(`${API_BASE}/get_config.php`);
+                const data = await res.json();
+                if (data.success && data.data) {
+                    localStorage.setItem(CONFIG_KEY, JSON.stringify(data.data));
+                    return data.data;
+                }
+            } catch (e) {
+                console.warn('Cannot fetch config from API, fallback to local', e);
+            }
+
+            try {
+                const saved = localStorage.getItem(CONFIG_KEY);
+                return saved ? JSON.parse(saved) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function saveTournamentConfig(groups) {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(groups));
+            try {
+                await fetch(`${API_BASE}/save_config.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(groups)
+                });
+            } catch (e) {
+                console.error('Failed to save config to server', e);
+                alert('Không thể lưu cấu hình lên server. Dữ liệu chỉ được lưu trên máy này.');
+            }
+        }
+
+        function fillSetupForm(groups) {
+            if (!groups) return;
+            document.getElementById('setup-group-a').value = (groups.groupA || []).join('\n');
+            document.getElementById('setup-group-b').value = (groups.groupB || []).join('\n');
+            document.getElementById('setup-group-c').value = (groups.groupC || []).join('\n');
+        }
+
+        function initSetupEvents() {
+            const btn = document.getElementById('btn-create-tournament');
+            // Remove old listeners by cloning (simple trick) or just assign onclick
+            btn.onclick = () => {
+                const getLines = (id) => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(s => s);
+                const gA = getLines('setup-group-a');
+                const gB = getLines('setup-group-b');
+                const gC = getLines('setup-group-c');
+
+                if (gA.length === 0 && gB.length === 0 && gC.length === 0) {
+                    alert('Vui lòng nhập ít nhất 1 đội!');
+                    return;
+                }
+
+                if (confirm('TẠO GIẢI ĐẤU MỚI?\n\nHành động này sẽ XÓA TOÀN BỘ kết quả cũ. Bạn có chắc chắn?')) {
+                    const newConfig = { groupA: gA, groupB: gB, groupC: gC };
+                    
+                    // Xóa kết quả cũ
+                    localStorage.removeItem(STORAGE_KEY);
+                    matchResults = { groupA: [], groupB: [], groupC: [] };
+                    
+                    // Lưu cấu hình mới
+                    await saveTournamentConfig(newConfig);
+                    
+                    // Reload để áp dụng
+                    location.reload();
+                }
+            };
+            };
+        }
+
         // Lịch thi đấu cố định
         const FIXED_SCHEDULE = {
             day1: 'Chưa xác định',
@@ -617,7 +728,7 @@
             day5: 'Chưa xác định'    // Chung kết
         };
         const STORAGE_KEY = 'caulong_match_results_v3'; // Updated version key
-        const API_BASE = 'https://checkin.nq72.de';
+        const API_BASE = 'https://api-aiday.giday.net';
         let matchResults = { groupA: [], groupB: [], groupC: [] };
         let schedule = { groupA: [], groupB: [], groupC: [] };
 
@@ -735,10 +846,26 @@
         }
 
         // Khởi tạo giải đấu
-        function initializeTournament() {
-            // Lấy các đội cố định
-            const groups = getFixedGroups();
+        async function initializeTournament() {
+            const groups = await getTournamentGroups();
 
+            if (!groups) {
+                // Chưa có cấu hình -> Hiện màn hình setup
+                document.getElementById('setup-tournament-view').style.display = 'block';
+                document.getElementById('main-tournament-view').style.display = 'none';
+                
+                // Điền default vào form để user sửa cho nhanh
+                fillSetupForm(getDefaultGroups());
+                initSetupEvents();
+            } else {
+                // Đã có cấu hình -> Vào main app
+                document.getElementById('setup-tournament-view').style.display = 'none';
+                document.getElementById('main-tournament-view').style.display = 'block';
+                startApp(groups);
+            }
+        }
+
+        function startApp(groups) {
             // Hiển thị các đội trong bảng
             displayTeams('groupA-teams', groups.groupA);
             displayTeams('groupB-teams', groups.groupB);
@@ -1051,7 +1178,7 @@
                         // matchResults = data.data; // Server might return all, but be careful
                         // Ở đây ta cứ save local đã vì code cũ logic vậy
                         saveMatchResults();
-                        const groups = getFixedGroups();
+                        const groups = await getTournamentGroups();
                         updateDisplay(groups);
                         statusEl.textContent = 'Đã lưu.';
                         statusEl.style.color = '#2e7d32';
@@ -1060,7 +1187,7 @@
                         // throw new Error(data.message || 'Lỗi lưu kết quả');
                         // Tạm thời fallback luôn cho an toàn
                         saveMatchResults();
-                        const groups = getFixedGroups();
+                        const groups = await getTournamentGroups();
                         updateDisplay(groups);
                         statusEl.textContent = 'Đã lưu (Local).';
                         statusEl.style.color = '#2e7d32';
@@ -1068,7 +1195,7 @@
                 } catch (e) {
                     // Fallback: lưu local
                     saveMatchResults();
-                    const groups = getFixedGroups();
+                    const groups = await getTournamentGroups();
                     updateDisplay(groups);
                     statusEl.textContent = 'Mất kết nối, đã lưu tạm trên trình duyệt.';
                     statusEl.style.color = '#d32f2f';
@@ -1079,6 +1206,50 @@
 
             // Trigger set default selection
             select.dispatchEvent(new Event('change'));
+
+            // Reset tournament event listener
+            const resetBtn = document.getElementById('reset-tournament');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', async () => {
+                    if (confirm('BẠN CÓ CHẮC CHẮN MUỐN RESET KHÔNG?\n\nHành động này sẽ XÓA TOÀN BỘ kết quả hiện tại!')) {
+                        if (confirm('Xác nhận lần cuối: Toàn bộ dữ liệu sẽ bị mất. Tiếp tục?')) {
+                            // 1. Clear LocalStorage
+                            localStorage.removeItem(STORAGE_KEY);
+
+                            // 2. Clear Server Data
+                            try {
+                                const res = await fetch(`${API_BASE}/reset_tournament.php`, {
+                                    method: 'POST'
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                    alert('Đã reset giải đấu thành công!');
+                                } else {
+                                    alert('Lỗi server: ' + (data.message || 'Unknown error'));
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                alert('Không thể kết nối server để reset, nhưng đã xóa dữ liệu trên trình duyệt.');
+                            }
+
+                            // 3. Reset State & UI
+                            // 4. Clear Config to trigger Setup
+                            localStorage.removeItem(CONFIG_KEY);
+                            
+                            // Reload
+                            location.reload();
+
+                            // Reset form fields
+                            set1t1.value = '';
+                            set1t2.value = '';
+                            set2t1.value = '';
+                            set2t2.value = '';
+                            select.selectedIndex = 0;
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+            }
         }
 
         function getSelectedMatch(value, schedule) {
