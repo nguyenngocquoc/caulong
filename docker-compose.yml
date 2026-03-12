@@ -1,0 +1,60 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: babminton-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - appnet
+
+  php:
+    build: .
+    container_name: babminton-php
+    environment:
+      DB_HOST: mysql
+      DB_NAME: appdb
+      DB_USER: appuser
+      DB_PASS: secret
+    volumes:
+      - ./www:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - appnet
+
+  mysql:
+    image: mysql:8.0
+    container_name: babminton-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: secret
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    expose:
+      - "3306"
+    networks:
+      - appnet
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: babminton-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge

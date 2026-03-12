@@ -508,8 +508,8 @@
                                 <th>Thắng</th>
                                 <th>Hòa</th>
                                 <th>Thua</th>
-                                <th>Hiệu số</th>
                                 <th>Điểm</th>
+                                <th>Hiệu số</th>
                             </tr>
                         </thead>
                         <tbody id="results-body-a"></tbody>
@@ -530,8 +530,8 @@
                                 <th>Thắng</th>
                                 <th>Hòa</th>
                                 <th>Thua</th>
-                                <th>Hiệu số</th>
                                 <th>Điểm</th>
+                                <th>Hiệu số</th>
                             </tr>
                         </thead>
                         <tbody id="results-body-b"></tbody>
@@ -552,8 +552,8 @@
                                 <th>Thắng</th>
                                 <th>Hòa</th>
                                 <th>Thua</th>
-                                <th>Hiệu số</th>
                                 <th>Điểm</th>
+                                <th>Hiệu số</th>
                             </tr>
                         </thead>
                         <tbody id="results-body-c"></tbody>
@@ -589,8 +589,7 @@
             <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
             <div style="margin-top: 20px;">
-                <button id="reset-tournament" style="background: #d32f2f; color: white;">RESET GIẢI ĐẤU (TẠO
-                    MỚI)</button>
+                <button id="reset-tournament" style="background: #d32f2f; color: white;">Tạo giải đấu mới</button>
                 <p class="helper" style="margin-top: 5px; color: #d32f2f;">Lưu ý: Hành động này sẽ xóa toàn bộ kết quả
                     hiện tại và tạo giải đấu mới.</p>
             </div>
@@ -620,23 +619,14 @@
         function getDefaultGroups() {
             // BẢNG A
             const groupA = [
-                'T.Duy – Duyên',
-                'Phúc – Sơn',
-                'a Phương – Trinh'
             ];
 
             // BẢNG B
             const groupB = [
-                'N.Duy – Thúy',
-                'Đỉnh – Trúc',
-                'Tuấn – Tâm Như'
             ];
 
             // BẢNG C
             const groupC = [
-                'D.Kiên – Thanh',
-                'Thành – Xuân',
-                'Nghĩa – Quốc'
             ];
 
             return {
@@ -728,7 +718,7 @@
             day5: 'Chưa xác định'    // Chung kết
         };
         const STORAGE_KEY = 'caulong_match_results_v3'; // Updated version key
-        const API_BASE = 'https://api-aiday.giday.net';
+        const API_BASE = 'http://localhost/api';
         let matchResults = { groupA: [], groupB: [], groupC: [] };
         let schedule = { groupA: [], groupB: [], groupC: [] };
 
@@ -814,12 +804,18 @@
 
             // Chuyển đổi thành mảng và sắp xếp
             const sorted = Object.values(standings).sort((a, b) => {
+                // 1. Phân thứ hạng theo Điểm số (match points: 2, 1, 0)
                 if (b.points !== a.points) return b.points - a.points;
-                if (b.wins !== a.wins) return b.wins - a.wins;
+                
+                // 2. Nếu bằng điểm, xét Hiệu số (tổng điểm ghi - tổng điểm thua)
                 const diffA = a.scored - a.conceded;
                 const diffB = b.scored - b.conceded;
-                if (diffB !== diffA) return diffB - diffA; // ưu tiên hiệu số
-                if (b.scored !== a.scored) return b.scored - a.scored; // sau đó tổng điểm ghi
+                if (diffB !== diffA) return diffB - diffA;
+
+                // 3. Nếu vẫn bằng, xét Tổng điểm ghi (Điểm số trong các set)
+                if (b.scored !== a.scored) return b.scored - a.scored;
+
+                // 4. Cuối cùng xét tên đội
                 return a.team.localeCompare(b.team);
             });
 
@@ -839,8 +835,8 @@
                     <td>${team.wins}</td>
                     <td>${team.draws}</td>
                     <td>${team.losses}</td>
-                    <td>${team.scored - team.conceded}</td>
                     <td class="points">${team.points}</td>
+                    <td>${team.scored - team.conceded}</td>
                 </tr>
             `).join('');
         }
@@ -865,11 +861,32 @@
             }
         }
 
+        function updateVisibility(groups) {
+            const toggle = (id, hasData) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const container = el.closest('.group') || el.closest('.results-table');
+                if (container) {
+                    container.style.display = hasData ? '' : 'none';
+                }
+            };
+            
+            toggle('groupA-teams', groups.groupA && groups.groupA.length > 0);
+            toggle('groupB-teams', groups.groupB && groups.groupB.length > 0);
+            toggle('groupC-teams', groups.groupC && groups.groupC.length > 0);
+            
+            toggle('results-table-a', groups.groupA && groups.groupA.length > 0);
+            toggle('results-table-b', groups.groupB && groups.groupB.length > 0);
+            toggle('results-table-c', groups.groupC && groups.groupC.length > 0);
+        }
+
         function startApp(groups) {
+            updateVisibility(groups);
+
             // Hiển thị các đội trong bảng
-            displayTeams('groupA-teams', groups.groupA);
-            displayTeams('groupB-teams', groups.groupB);
-            displayTeams('groupC-teams', groups.groupC);
+            if (groups.groupA && groups.groupA.length) displayTeams('groupA-teams', groups.groupA);
+            if (groups.groupB && groups.groupB.length) displayTeams('groupB-teams', groups.groupB);
+            if (groups.groupC && groups.groupC.length) displayTeams('groupC-teams', groups.groupC);
 
             // Lịch thi đấu
             schedule = createGroupStageSchedule(groups);
@@ -935,9 +952,9 @@
                 return section;
             };
 
-            html += renderGroup('groupA', 'BẢNG A', 'group-a');
-            html += renderGroup('groupB', 'BẢNG B', 'group-b');
-            html += renderGroup('groupC', 'BẢNG C', 'group-c');
+            if (schedule.groupA && schedule.groupA.length > 0) html += renderGroup('groupA', 'BẢNG A', 'group-a');
+            if (schedule.groupB && schedule.groupB.length > 0) html += renderGroup('groupB', 'BẢNG B', 'group-b');
+            if (schedule.groupC && schedule.groupC.length > 0) html += renderGroup('groupC', 'BẢNG C', 'group-c');
 
             container.innerHTML = html;
         }
@@ -1105,6 +1122,7 @@
             // Tạo options cho tất cả trận vòng bảng
             const options = [];
             ['groupA', 'groupB', 'groupC'].forEach(key => {
+                if (!schedule[key] || schedule[key].length === 0) return;
                 schedule[key].forEach((m, idx) => {
                     let labelKey = key === 'groupA' ? 'A' : (key === 'groupB' ? 'B' : 'C');
                     options.push({ label: `Bảng ${labelKey} - Trận ${idx + 1}: ${m.team1} vs ${m.team2}`, value: `${key}:${idx}` });

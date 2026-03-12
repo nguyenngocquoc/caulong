@@ -1,0 +1,5 @@
+mysql_data/
+.DS_Store
+Thumbs.db
+*.log
+www/api/save_result.zip
